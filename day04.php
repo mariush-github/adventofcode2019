@@ -1,5 +1,5 @@
 <?php
-
+$start = microtime(true);
 // see https://adventofcode.com/2019/day/4
 
 // going for the brute force method
@@ -60,10 +60,13 @@ for ($i=$min;$i<=$max;$i++){
     }
     if (($decrease==false) && ($hasdouble==true)) {
         $count++;
-        echo $i."\n";
+        //echo $i."\n";
         part2($i);
     }
 }
 echo 'part 1 solution: '.$count."\n";
 echo 'part 2 solution: '.$count2;
+
+$finish = microtime(true);
+echo "\n".($finish-$start);
 ?>
