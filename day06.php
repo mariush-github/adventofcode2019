@@ -44,8 +44,6 @@ function chain($name) {
     return $list;
 }
 
-$direct = 0;
-$indirect = 0;
 $total = 0;
 
 echo "There are ".count($items_unique)." planets and ".count($items_orbits)." orbits.\n";
