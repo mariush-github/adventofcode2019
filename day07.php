@@ -2,7 +2,6 @@
 
 // see https://adventofcode.com/2019/day/7
 
-
 class Computer {
 
     private $debug;
@@ -48,10 +47,8 @@ class Computer {
             foreach ($this->code as $idx => $value) { $this->code[$idx] = intval(trim($value)); } 
             if ($autostart==true) $this->run();
         }
-
-
-
     }
+
     public function input($value) {
         $this->code[$this->input_addr] = $value;
         if ($this->debug==true) {
@@ -106,7 +103,7 @@ class Computer {
                 $log = ' JEQ, '.$c.' -> '.$this->addrs[2];
             }
             if ($this->opcode==99) {
-                $log = ' EXIT';
+                $log = " EXIT\n";
                 $this->running = false;
                 $continue = false;
             }
@@ -142,11 +139,10 @@ class Computer {
                  str_pad($this->opcode,2,' ',STR_PAD_LEFT).' '.
                  str_pad($this->opcodes[$this->opcode]['label'],6,' ',STR_PAD_LEFT).' '.
                  'm='.$this->modes[0].$this->modes[1].$this->modes[2].' '.
-                 'a=[ '.str_pad($this->addrs[0],6,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[1],6,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[2],6,' ',STR_PAD_LEFT).' ] '.
-                 'v=[ '.str_pad($this->valus[0],6,' ',STR_PAD_LEFT).' '.str_pad($this->valus[1],6,' ',STR_PAD_LEFT).' '.str_pad($this->valus[2],6,' ',STR_PAD_LEFT).' ] ';
+                 'a=[ '.str_pad($this->addrs[0],8,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[1],8,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[2],8,' ',STR_PAD_LEFT).' ] '.
+                 'v=[ '.str_pad($this->valus[0],8,' ',STR_PAD_LEFT).' '.str_pad($this->valus[1],8,' ',STR_PAD_LEFT).' '.str_pad($this->valus[2],8,' ',STR_PAD_LEFT).' ] ';
         }
     }
-
 }
 
 
