@@ -87,7 +87,7 @@ class Computer {
                 }
             }
             if ($this->opcode==6) { // jump if false
-                if ($valus[0]==0) {
+                if ($this->valus[0]==0) {
                     $this->counter = $this->valus[1];
                     $log = ' JIF='.$this->counter;
                 }
