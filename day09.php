@@ -1,6 +1,6 @@
 <?php
 
-// see https://adventofcode.com/2019/day/8
+// see https://adventofcode.com/2019/day/9
 
 class Computer {
 
@@ -15,8 +15,8 @@ class Computer {
     private $addrs;
     private $valus;
     private $modes;
-    private $input_addr;
-    private $relative;
+    private $addr_input;
+    private $addr_relative;
 
     public $output;
     public $pauseReason;
@@ -39,23 +39,23 @@ class Computer {
            );
         $this->valus = array(0,0,0);
         $this->addrs = array(0,0,0);
-        $this->modes = array(0,0,0); // 0=address, 1=immediate
-        $this->input_addr = -1;
+        $this->modes = array(0,0,0); // 0=address, 1=immediate, 2=relative
+        $this->addr_input = -1;
         $this->counter = 0;
-        $this->relative = 0;
+        $this->addr_relative = 0;
         $this->running = false;
         $this->pauseReason = ''; // pause on input, output, future (which will show up here)
         if (trim($codetext)!='') {        
             $this->code = explode(',',$codetext);
-            foreach ($this->code as $idx => $value) { $this->code[$idx] = floatval(trim($value)); } 
+            foreach ($this->code as $index => $value) { $this->code[$index] = floatval(trim($value)); } 
             if ($autostart==true) $this->run();
         }
     }
 
     public function input($value) {
-        $this->code[$this->input_addr] = $value;
+        $this->code[$this->addr_input] = $value;
         if ($this->debug==true) {
-            echo /*str_pad($this->debug_id,2,' ',STR_PAD_LEFT).' '.*/ ' '.str_pad($this->input_addr,2,' ',STR_PAD_LEFT).' INPUT '.$value;
+            echo /*str_pad($this->debug_id,2,' ',STR_PAD_LEFT).' '.*/ ' '.str_pad($this->addr_input,2,' ',STR_PAD_LEFT).' INPUT '.$value;
         }
         $this->run();
     }
@@ -76,7 +76,7 @@ class Computer {
             }
             if ($this->opcode==3) {  // input (memorize address and pause, input value from main program)
                 $this->pauseReason = 'input';
-                $this->input_addr = $this->addrs[0];
+                $this->addr_input = $this->addrs[0];
                 $continue = FALSE;
             }
             if ($this->opcode==4) {  // output
@@ -106,8 +106,8 @@ class Computer {
                 $log = ' JEQ, '.$c.' -> '.$this->addrs[2];
             }
             if ($this->opcode==9) {
-                $this->relative += $this->valus[0];
-                $log = ' REL = '.$this->relative;
+                $this->addr_relative += $this->valus[0];
+                $log = ' REL = '.$this->addr_relative;
             }
             if ($this->opcode==99) {
                 $log = " EXIT\n";
@@ -117,33 +117,42 @@ class Computer {
             if ($this->debug==true) echo $log;
         }
     }
+    private function get_value($address) {
+        return (isset($this->code[$address])==TRUE) ? $this->code[$address] : 0;
+    }
+    
+    private function get_counter_value($autoincrement=true) {
+        $value = (isset($this->code[$this->counter])==TRUE) ? $this->code[$this->counter] : 0;
+        if ($autoincrement==true) $this->counter++;
+        return $value;
+    }
 
     private function decode_opcode() {
-        $temp = str_pad($this->code[$this->counter],5,'0',STR_PAD_LEFT);
-        $this->counter++;
+        $this->opcode = $this->get_counter_value();
+        if ($this->opcode<0) die("Invalid opcode encountered at address ".($this->counter-1).": $this->opcode");
+        $temp = str_pad($this->opcode,5,'0',STR_PAD_LEFT);
         for ($i=0;$i<3;$i++) {
             $this->addrs[$i] = -1;
             $this->valus[$i] = 0;
             $this->modes[$i] = 0;
         }
-        $this->opcode = floatval(substr($temp,3,2));
+        $this->opcode = intval(substr($temp,3,2));
         $valid = false;
         foreach ($this->opcodes as $key => $value) { if ($this->opcode==$key) $valid=true; }
-        if ($valid==false) die("Encountered invalid opcode at offset $this->counter! [opcode=$this->opcode ($this->opcode)]\n");
+        if ($valid==false) die("Encountered invalid opcode at offset $this->counter! [opcode=$this->opcode]\n");
         
         for ($i=0;$i<$this->opcodes[$this->opcode]['count'];$i++) {
-            $this->modes[$i] = floatval(substr($temp,2-$i,1));
-            $value = (isset($this->code[$this->counter])==TRUE) ? $this->code[$this->counter] : 0;
+            $this->modes[$i] = ord(substr($temp,2-$i,1))-0x30;
+            $value = $this->get_counter_value(); // auto increments counter
             if ($this->modes[$i]==1) $this->valus[$i] = $value;
             if ($this->modes[$i]==0) {
-                $this->addrs[$i] = $this->code[$this->counter];
-                $this->valus[$i] = (isset($this->code[$this->addrs[$i]])==TRUE) ? $this->code[$this->addrs[$i]] : 0;
+                $this->addrs[$i] = $value;
+                $this->valus[$i] = $this->get_value($this->addrs[$i]);
             }
             if ($this->modes[$i]==2) { 
-                $this->addrs[$i] = $this->relative + ((isset($this->code[$this->counter])==TRUE) ? $this->code[$this->counter] : 0);
-                $this->valus[$i] = (isset($this->code[$this->addrs[$i]])==TRUE) ? $this->code[$this->addrs[$i]] : 0;
+                $this->addrs[$i] = $this->addr_relative + $value;
+                $this->valus[$i] = $this->get_value($this->addrs[$i]);
             }
-            $this->counter++;
         }
         if ($this->debug==true) {
             echo "\n".str_pad($this->debug_id,2,' ',STR_PAD_LEFT).' '.
@@ -151,8 +160,11 @@ class Computer {
                  str_pad($this->opcode,2,' ',STR_PAD_LEFT).' '.
                  str_pad($this->opcodes[$this->opcode]['label'],6,' ',STR_PAD_LEFT).' '.
                  'm='.$this->modes[0].$this->modes[1].$this->modes[2].' '.
-                 'a=[ '.str_pad($this->addrs[0],8,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[1],8,' ',STR_PAD_LEFT).' '.str_pad($this->addrs[2],8,' ',STR_PAD_LEFT).' ] '.
-                 'v=[ '.str_pad($this->valus[0],8,' ',STR_PAD_LEFT).' '.str_pad($this->valus[1],8,' ',STR_PAD_LEFT).' '.str_pad($this->valus[2],8,' ',STR_PAD_LEFT).' ] ';
+                 'a=[ ';
+            for ($i=0;$i<3;$i++) echo str_pad($this->addrs[$i],6,' ',STR_PAD_LEFT).' ';
+            echo ' ] '.'v=[ ';
+            for ($i=0;$i<3;$i++) echo str_pad($this->valus[$i]>99999999 ? dechex($this->valus[$i]) : $this->valus[$i],8,' ',STR_PAD_LEFT).' ';
+            echo ' ]';
         }
     }
 }
