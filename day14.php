@@ -4,9 +4,6 @@ $chemicals = array();
 $f = array(); // formulas
 $extras = array();
 
-// $q = array(); // minimum quantity for each element
-
-
 $text = file_get_contents(__DIR__ .'/inputs/14.txt');
 $text = str_replace(chr(0x0D).chr(0x0A),chr(0x0A),$text);
 $text = str_replace(', ',',',$text);
@@ -171,6 +168,12 @@ function calculate_ore($number=1) {
 $ore = calculate_ore(1);
 echo "\nTotal ore: $ore \n";
 
+// Part 2 : guess count for ore amount
+// 
+// Sort of brute force , start by calculating in huge steps, 
+// then refine using smaller and smaller increments 
+// works reasonable fast.
+//
 
 $min_ore = $ore;
 $min_cnt = 1;
