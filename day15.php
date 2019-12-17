@@ -159,7 +159,7 @@ function robot_move($from_x,$from_y,$to_x,$to_y) {
     global $robot;
     $command = '';
     if ($to_x == $from_x && $to_y <  $from_y) $command = 1; // ^ NORTH (1)
-    if ($to_x == $from_x && $to_y >  $from_y) $command = 2; // < WEST (3)
+    if ($to_x == $from_x && $to_y >  $from_y) $command = 2; // v SOUTH (2)
     if ($to_x <  $from_x && $to_y == $from_y) $command = 3; // < WEST (3)
     if ($to_x >  $from_x && $to_y == $from_y) $command = 4; // < EAST (4)
     $robot->input($command);
