@@ -186,7 +186,7 @@ function can_scan($x,$y) {
 
 }
 
-$generateHTML=false;
+$generateHTML=false; // set this to true to have script generate a HTML file with the animation
 
 $jsonArray = array();
 
