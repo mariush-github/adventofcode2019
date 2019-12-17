@@ -11,7 +11,8 @@ define('DIR_SOUTH',2);
 
 include 'intCode.php';
 
-
+$generateHTML=false;    // set this to true to have script generate a HTML file with the animation
+$delay = 50000;        // uS to delay between frames
 
 class clsMap {
     private $data;
@@ -142,7 +143,6 @@ function create_node($x,$y,$parent=null) {
     $node = new stdClass;
     $node->x = $x;
     $node->y = $y;
-    $node->o = 0;   // how many minutes until oxygen is in this node
     $node->prev = $parent;
     $node->next = array();
     $node->scan = false; // did we look around?
@@ -151,10 +151,7 @@ function create_node($x,$y,$parent=null) {
     $nodes[$index] = $node;
     if ($parent!==null) {
         array_push($nodes[$parent]->next,$index);
-        //var_dump($nodes[$parent]);
     }
-    //var_dump($nodes[$index]);
-    
     return $index;
 }
 // TRIES to move in one direction, returns what the robot says
@@ -177,16 +174,12 @@ function robot_peek($from_x,$from_y,$to_x,$to_y) {
     return $answer;
 
 }
-// 
+
 function can_scan($x,$y) {
     global $nodes,$map;
     $value = $map->get($x,$y);
     return ($value==BLOCK_UNKNOWN) ? TRUE : FALSE;
-
-
 }
-
-$generateHTML=false; // set this to true to have script generate a HTML file with the animation
 
 $jsonArray = array();
 
@@ -235,7 +228,7 @@ while ($continue == true){
         $nodes[$node]->scan = true;
         $text = $map->display();
         array_push($jsonArray,$text);
-        usleep(500000);
+        usleep($delay);
     }
     
     $m = null;
@@ -265,7 +258,7 @@ while ($continue == true){
             $map->set_player($m,$n);
             $text = $map->display();
             array_push($jsonArray,$text);
-            usleep(50000);
+            usleep($delay);
         }
     } else {
         // there's at least one route we can advance 
@@ -274,7 +267,7 @@ while ($continue == true){
         $map->set_player($m,$n);
         $text = $map->display();
         array_push($jsonArray,$text);
-        usleep(50000);
+        usleep($delay);
         
     }
 
@@ -294,7 +287,7 @@ while ($continue==true) {
     for ($j=0;$j<100;$j++) {
         for ($i=0;$i<100;$i++) {
             if ($level == $map->get_ox($i,$j)) {
-                $dirs = [ [-1,0],[1,0],[0,-1],[0,1]];
+                $dirs = [[-1,0],[1,0],[0,-1],[0,1]];
                 for ($k=0;$k<4;$k++) {
                     $m = $i+$dirs[$k][0];
                     $n = $j+$dirs[$k][1];
