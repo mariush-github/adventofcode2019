@@ -6,26 +6,20 @@ function text2array($text) {
         $a[$i] = ord(substr($text,$i,1))-0x30;
     }
     return $a;
-
 }
 
-$code = str_replace(array(' ',"\n"),'',file_get_contents(__DIR__ .'/inputs/16.txt'));
-//$code = '12345678';
+function process() {
+    global $input,$output,$inputlen;
+    $output = array();
+    $pattern = array();
+    $pattern_values = [0,1,0,-1];
+    $pattern_pos = 0;
+    $pattern_counter = 0;
 
-$part = 2; // change this to 1 or 2, to get answer to each part
+    $half = intdiv($inputlen,2);
 
-if ($part == 2) $code = str_pad($code,strlen($code)*10000,$code);
-$input = text2array($code);
-$inputlen = strlen($code);
-$output = array();
-$pattern = array();
-$pattern_values = [0,1,0,-1];
-$pattern_pos = 0;
-$pattern_counter = 0;
-
-//echo json_encode($input)."\n";
-for ($phase=1;$phase<101;$phase++) {
-    for ($j=0;$j<$inputlen;$j++){
+    // sorry, simply too tired (and a bit lazy) to figure out the trick and simplify the first half
+    for ($j=0;$j<$half;$j++){
         $level=$j+1;
         $pattern_max = $level;
         $pattern_pos = ($level==1) ? 1 : 0;
@@ -43,24 +37,54 @@ for ($phase=1;$phase<101;$phase++) {
                 $pattern_value = $pattern_values[$pattern_pos];
             }
         }
-        //echo "\n";
-        //echo '='.$output[$j];
-        $output[$j] = abs($output[$j]) % 10;
-        //echo '['.$output[$j]."]\n";
 
-        //echo json_encode($pattern);
-        //die();
+        $output[$j] = abs($output[$j]) % 10;
     }
+    $total =0;
+    for ($j=$inputlen-1;$j>=$half;$j--) {
+        $total += $input[$j];
+        $output[$j] = $total % 10;
+    }
+}
+
+function process2() {
+    global $input,$output,$inputlen,$offset;
+    $output = array();
+    $total =0;
+    for ($j=$inputlen-1;$j>=$offset-2;$j--) {
+        $total += $input[$j];
+        $output[$j] = $total % 10;
+    }
+}
+
+$code = str_replace(array(' ',"\n"),'',file_get_contents(__DIR__ .'/inputs/16.txt'));
+//$code = '123456789012';
+
+$input = text2array($code);
+$inputlen = strlen($code);
+$output = array();
+
+for ($phase=1;$phase<101;$phase++) {
+    process();
     echo "After phase $phase : ";
     for ($i=0;$i<8;$i++) echo $output[$i];
     echo "\n";
     $input = $output;
 }
-if ($part==2) {
-    echo "Part 2: ";
-    $offset = 0;
-    for ($i=0;$i<7;$i++) $offset = $offset * 10 + $output[$i];
-    echo "offset=".$offset." code=";
-    for ($i=$offset-2;$i<$offset+12;$i++) echo $output[$i];
+
+$code = str_pad($code,strlen($code)*10000,$code);
+$offset = intval(substr($code,0,7));
+echo "offset=$offset\n";
+$input = text2array($code);
+$inputlen = strlen($code);
+$output = array();
+
+for ($phase=1;$phase<101;$phase++) {
+    process2();
+    echo ".";
+    $input = $output;
 }
+echo "\n";
+for ($i=$offset;$i<$offset+8;$i++) echo $output[$i];
+
 ?>
