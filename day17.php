@@ -79,7 +79,7 @@ while ($continue) {
         $x = $x + ($segment_length)*$move[0];
         $y = $y + ($segment_length)*$move[1];
         $orientation=$move[3];
-        echo $move[2].','.$segment_length."\n";
+        //echo $move[2].','.$segment_length."\n";
         $sequence .= $move[2].chr(0x60 + $segment_length);
         $continue=true;
         //echo "x=$x y=$y o=$orientation\n";
