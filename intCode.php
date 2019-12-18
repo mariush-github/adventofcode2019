@@ -177,7 +177,7 @@ public function run() {
             case 4:
                 array_push($this->outputs,$this->opcode->v[0]);
                 if ($this->cfg['pause_output']==true) {
-                    $this->pauseReason = 'ouput';
+                    $this->pauseReason = 'output';
                     $continue = FALSE;
                 }
                 break;
