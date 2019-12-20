@@ -17,6 +17,7 @@ public $pauseReason;
 public $running;
 
 private $cfg;
+private $originalCode;  // a backup of original code loaded in the "computer", to use on reset
 
 public function __construct($code='99') {
     $this->opcodes = array(
@@ -65,12 +66,17 @@ public function load($code) {
         $s = trim($value); if ($s!='') { $this->memory[$i] = intval($s); $i++; }
     }
     $this->pc = 0;
+    $this->originalCode = $code;
     //echo "Loaded $i values.\n";
 }
 public function reset() {
-    $this->pc = 0;
     $this->addr_relative = 0;
     $this->addr_input = -1;
+    $this->pauseReason = '';
+    $this->running=false;
+    $this->outputs = array();
+    $this->load($this->originalCode);
+
 }
 
 private function defaultOpcode() {
