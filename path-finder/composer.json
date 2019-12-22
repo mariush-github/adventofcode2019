@@ -1,0 +1,23 @@
+{
+    "name" : "letournel/path-finder",
+    "description" : "Path finder algorithm",
+    "keywords": ["graph algorithms", "shortest path", "travelling salesman", "astar", "dijkstra", "floydwarshall", "nearest neighbour", "2opt", "3opt"],
+    "license": "MIT",
+    "authors" : [{
+            "name" : "Adrien Letournel",
+            "email" : "4dr13n.l370urn3l@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : "~4.0"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Letournel\\PathFinder\\" : "src",
+            "Letournel\\PathFinder\\Tests\\" : "tests"
+        }
+    }
+}

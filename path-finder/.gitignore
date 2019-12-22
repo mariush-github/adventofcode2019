@@ -1,0 +1,14 @@
+# Composer files
+composer.phar
+composer.lock
+vendor/
+
+# Eclipse files
+.buildpath
+.project
+.settings/
+
+# Code coverage report
+report/
+
+path-finder/vendor/
