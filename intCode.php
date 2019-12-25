@@ -76,7 +76,40 @@ public function reset() {
     $this->running=false;
     $this->outputs = array();
     $this->load($this->originalCode);
+}
 
+public function export() {
+    $export_data = [];
+    $export_data['addr_input'] = $this->addr_input;
+    $export_data['addr_relative'] = $this->addr_relative;
+    $export_data['pauseReason'] = $this->pauseReason;
+    $export_data['running'] = ($this->running==true) ? 1 : 0;
+    $export_data['pc'] = $this->pc;
+    $max_offset = 0;
+    foreach ($this->memory as $i => $value) {
+        if ($max_offset<$i) $max_offset = $i;
+    }
+    $text = '';
+    for ($i=0;$i<=$max_offset;$i++) {
+        $nr = (isset($this->memory[$i])==true) ? $this->memory[$i] : 0;
+        $text .= ','.$nr; 
+    } 
+    $text = trim($text,',');
+    $export_data['code'] = $text;
+    return json_encode($export_data);
+}
+
+public function import($data) {
+    $export_data = json_decode($data,true);
+    $this->outputs = array();
+    //var_dump($export_data);
+    $this->addr_input = $export_data['addr_input'];
+    $this->addr_relative = $export_data['addr_relative'];
+    $this->pauseReason = $export_data['pauseReason'];
+    $this->running = ($export_data['running']==1) ? true : false;
+    $this->load($export_data['code']);
+    $this->pc = $export_data['pc'];
+    //var_dump($this);
 }
 
 private function defaultOpcode() {
